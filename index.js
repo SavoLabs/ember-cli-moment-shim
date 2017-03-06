@@ -48,21 +48,28 @@ module.exports = {
       throw new Error('Application instance must be passed to import');
     }
 
+    var isProduction = app.env === 'production';
+
     var vendor = this.treePaths.vendor;
     var options = this.momentOptions;
 
     if (options.includeTimezone) {
-      app.import({
-        development: vendor + '/moment-timezone/tz.js',
-        production: vendor + '/moment-timezone/tz.min.js'
-      }, { prepend: true });
+
+      if(isProduction){
+        app.import(vendor + '/moment-timezone/tz.min.js', {prepend: true});
+      } else {
+        app.import(vendor + '/moment-timezone/tz.js', { prepend: true });
+      }
     }
 
     if (typeof options.includeLocales === 'boolean' && options.includeLocales) {
-      app.import({
-        development: vendor + '/moment/min/moment-with-locales.js',
-        production: vendor + '/moment/min/moment-with-locales.min.js'
-      }, { prepend: true });
+
+      if(isProduction){
+        app.import(vendor + '/moment/min/moment-with-locales.min.js', {prepend: true});
+      } else {
+        app.import(vendor + '/moment/min/moment-with-locales.js', { prepend: true });
+      }
+
     }
     else {
       if (Array.isArray(options.includeLocales)) {
@@ -70,11 +77,13 @@ module.exports = {
           app.import(vendor + '/moment/locales/' + locale + '.js', { prepend: true });
         });
       }
+      
+      if(isProduction){
+        app.import(vendor + '/moment/moment.min.js', {prepend: true});
+      } else {
+        app.import(vendor + '/moment/moment.js', { prepend: true });
+      }
 
-      app.import({
-        development: vendor + '/moment/moment.js',
-        production: vendor + '/moment/min/moment.min.js'
-      }, { prepend: true });
     }
   },
 
